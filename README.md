@@ -42,8 +42,7 @@ This pipeline was tested with public M. tuberculosis sequencing data from NCBI S
    	            reads_dir  = '/path/to/fastq'
  		    ref_fasta  = '/path/to/NC_000962.3.fasta'
      		    out_prefix = 'consensus'
-  	            outdir     = '/path/to/output_dir'
-}
+	   outdir     = '/path/to/output_dir'}
 
 ## **Conda Environment (Recommended)**
 	• To ensure full reproducibility and compatibility, use the provided Conda environment file:
