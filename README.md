@@ -1,16 +1,16 @@
 # M.-tuberculosis-Consensus-Genome-Pipeline
 This Nextflow pipeline maps raw paired-end FASTQ files of a single Mycobacterium tuberculosis (M. tuberculosis) sample to a reference genome, and generates a consensus genome sequence in FASTA format.
 
-Features
-	• Fully automated: from raw FASTQ to consensus FASTA
-	• Modular Nextflow DSL2 structure for clarity and scalability
-	• User can specify:
-	• Input FASTQ directory
-	• Reference genome FASTA path
-	• Output FASTA filename prefix
-	• Output directory for results
-	• Uses minimap2, samtools, and bcftools (industry-standard tools)
-	• Conda environment YAML provided for reproducibility
+## **Features**
+	- • Fully automated: from raw FASTQ to consensus FASTA
+	- • Modular Nextflow DSL2 structure for clarity and scalability
+	- • User can specify:
+	- • Input FASTQ directory
+	- • Reference genome FASTA path
+	- • Output FASTA filename prefix
+	- • Output directory for results
+	- • Uses minimap2, samtools, and bcftools (industry-standard tools)
+	- • Conda environment YAML provided for reproducibility
 
 Data Source
 This pipeline was tested with public M. tuberculosis sequencing data from NCBI SRA:
