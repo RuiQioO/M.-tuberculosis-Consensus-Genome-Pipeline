@@ -1,4 +1,4 @@
-# M.-tuberculosis-Consensus-Genome-Pipeline
+# M.tuberculosis-Consensus-Genome-Pipeline
 This Nextflow pipeline maps raw paired-end FASTQ files of a single Mycobacterium tuberculosis (M. tuberculosis) sample to a reference genome, and generates a consensus genome sequence in FASTA format.
 
 ## **Features**
