@@ -51,7 +51,8 @@ process mapping {
     """
 }
 
-
+// ====== 5. CONVERT SAM TO SORTED BAM ======
+// Converts SAM to sorted BAM, then indexes BAM file
 process sam2sortedbam {
     tag "${sample_id}"
     input:
@@ -66,7 +67,8 @@ process sam2sortedbam {
     """
 }
 
-// 6. 变异检测
+// ====== 6. VARIANT CALLING (BCFTOOLS) ======
+// Uses bcftools to call variants (VCF + index), ready for consensus step
 process variant_calling {
     tag "${sample_id}"
     input:
@@ -81,7 +83,8 @@ process variant_calling {
     """
 }
 
-// 7. consensus 生成
+// ====== 7. CONSENSUS FASTA GENERATION ======
+// Applies variants to reference to create consensus genome FASTA
 process consensus {
     tag "${sample_id}"
     input:
@@ -95,14 +98,15 @@ process consensus {
     """
 }
 
-// ----------- workflow 主体部分 -----------
+// ====== WORKFLOW DEFINITION ======
+// Connects all channels and processes in order
 workflow {
 
-    // 参考基因组索引
+    // Index the reference genome (minimap2 + samtools)
     index_ref_out = index_ref(ref_fasta_ch)
     mmi_ch = index_ref_out.mmi
 
-    // 生成 mapping 输入：[sample_id, reads], ref_fasta, mmi
+    // Combine fastq, reference fasta, and index for mapping
     mapping_input_ch = reads_ch
         .combine(ref_fasta_ch)
         .combine(mmi_ch)
@@ -110,21 +114,22 @@ workflow {
 
     mapped_ch = mapping(mapping_input_ch)
 
-    // sam2sortedbam 输入： [sample_id, sam]
+    // Convert SAM to sorted BAM
     bam_ch = sam2sortedbam(mapped_ch)
 
-    // variant_calling 输入：[sample_id, sorted_bam], ref_fasta
+    // Variant calling: input BAM and reference
     variant_input_ch = bam_ch
         .combine(ref_fasta_ch)
         .map { it.flatten() } // [sample_id, sorted_bam, ref_fasta]
 
     vcf_ch = variant_calling(variant_input_ch)
 
-    // consensus 输入：[sample_id, vcf_gz], ref_fasta
+    // Consensus: input VCF, its index, and reference fasta
     consensus_input_ch = vcf_ch
         .combine(ref_fasta_ch)
         .map { it.flatten() }
 
+    // Generate consensus FASTA in the output directory
     consensus(consensus_input_ch)
  }
 
