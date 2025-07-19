@@ -1,22 +1,27 @@
+// Enable Nextflow DSL2
 nextflow.enable.dsl=2
 
+// ====== PARAMETERS ======
 params.reads_dir  = params.reads_dir ?: "./fastq"
 params.ref_fasta  = params.ref_fasta ?: "./ref/NC_000962.3.fasta"
 params.out_prefix = params.out_prefix ?: "consensus"
 params.outdir     = params.outdir ?: "./result"
 
-// 1. 自动配对fastq，支持 _R1/_R2 命名
+// ====== 1. CREATE READS CHANNEL ======
+// Pair R1/R2 fastq files for a single sample (naming: *_1.fastq, *_2.fastq)
 Channel
     .fromFilePairs("${params.reads_dir}/*_{1,2}.fastq", flat: true)
     .set { reads_ch }
 reads_ch.view { "READS DEBUG: ${it}, type: ${it.getClass()}" }
-// 2. ref fasta channel
+
+// ====== 2. CREATE REFERENCE FASTA CHANNEL ======
 Channel
     .fromPath(params.ref_fasta)
     .ifEmpty { error "Reference fasta not found: ${params.ref_fasta}" }
     .set { ref_fasta_ch }
 
-// 3. 对参考基因组建索引
+// ====== 3. INDEX REFERENCE GENOME ======
+// This process generates minimap2 index (.mmi) and samtools fai index (.fai) for the reference
 process index_ref {
     tag "indexing"
     input:
@@ -31,7 +36,8 @@ process index_ref {
     """
 }
 
-// 4. 比对
+// ====== 4. MAP READS TO REFERENCE ======
+// Aligns paired-end reads to reference using minimap2
 process mapping {
     tag "${sample_id}"
     input:
@@ -45,7 +51,7 @@ process mapping {
     """
 }
 
-// 5. sam 转 sorted bam
+
 process sam2sortedbam {
     tag "${sample_id}"
     input:
